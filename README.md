@@ -78,3 +78,23 @@ After defining the repair function, register it to the toolbox under the alias `
 The DEAP library provides multiple [**predefined algorithms**](https://deap.readthedocs.io/en/master/api/algo.html#complete-algorithms) for executing the evolutionary loop. Since I am implementing the repair function and want to run the repair step mid-loop, I need to either design my own evolutionary loop, or modify the DEAP source code. I've decided to copy the `eaSimple` algorithm from the [**DEAP source code**](https://github.com/DEAP/deap/blob/master/deap/algorithms.py) and modify it.
 
 I've added the repair step after the crossover and mutation steps. This way, individuals can be "repaired" if they are broken during the previous steps and before they are evaluated. The rest of the steps in `eaSimpleWithRepair` are identical to `eaSimple` source code from the DEAP GitHub repository.
+
+## Define Genetic Algorithm
+In `GA()`, I begin by creating our population using the methods registered in the toolbox earlier. After creating the first generation, I run the repair function for each individual before starting the evolutionary loop. This is so that computation time is not wasted on the first generation, as some of the individuals may not be feasible do to random generation.
+
+### Data Collection
+The `eaSimpleWithRepair` method takes in a stats object similar to the toolbox. You can register metrics to the stats object that will be measure on each generation of the algorithm. Here I register `avg`, `min`, and `max` that will calculate the average, minimum, and maximum fitness score of each generation respectively.
+
+### Evolutionary Loop
+Next I call `eaSimpleRepair` with the following parameters:
+- `population`: The initial list of individuals the algorithm starts with
+- `toolbox`: The toolbox with all registered methods and genetic operators
+- `cxpb`: The probability of mating two individuals
+- `mutpb`: The probability of mutating an individual
+- `ngen`: The number of generations (stopping condition of evolutionary loop)
+- `stats`: The statistics object created previously that will collect data on population fitness values
+- `halloffame`: A HallOfFame object that contains the best individuals
+- `verbose`: Boolean value that determines if logbook is printed during running or not
+
+### Return Values
+This function returns the final population, the logbook, and the HallOfFame object.
